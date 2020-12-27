@@ -1,0 +1,76 @@
+#!/bin/bash
+
+url=$1
+fastdlrooturl=${url%/maps/*}
+mapfile=${url##*/}
+mapname=$(echo "$mapfile" | cut -f 1 -d '.')
+outputdir="out/$mapname"
+
+# Define map file relative paths
+MapFileRelPath="maps/$mapfile"
+ResFileRelPath="maps/$mapname.res"
+
+## Create map root folder
+mkdir -p $outputdir
+
+## Download map file
+mkdir -p "$outputdir/maps"
+
+if wget -q -P "$outputdir/maps" "$fastdlrooturl/$MapFileRelPath";
+then
+	echo "Success:  $mapfile"
+else
+	echo "Failed:  $mapfile"
+	exit
+fi
+
+## Generate res file
+resgenPath="/opt/resgen/RESGen.exe"
+resgenRFA="/opt/resgen/rfa/res_dod.rfa"
+
+echo | wine $resgenPath -b $resgenRFA "$outputdir/$MapFileRelPath" >/dev/null 2>&1
+
+## Download required resources based on the res file
+while IFS= read -r line
+do
+	# Strip whitespace
+	line="$(echo -e "${line}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+	
+	# If not a comment or an empty line, download the file
+	if [[ $line != "//"* ]]
+	then
+		if [[ -n $line ]]
+		then
+			targetdir="$outputdir/$(dirname "${line}")"
+			
+			# Need to create directory structure for the file and use this for the $outputdir
+			if wget -q -P $targetdir "$fastdlrooturl/$line";
+			then
+				echo "Success:  $line"
+			else
+				echo "Failed:  $line"
+			fi
+		fi
+	fi
+done < "./$outputdir/maps/$mapname.res"
+
+## Look for overview file
+if wget -q "$fastdlrooturl/overviews/$mapname.bmp";
+then
+	echo "Overview found!"
+
+	# Overview bitmap exists, create folder and move it there
+	mkdir -p "$outputdir/overviews"
+	mv "$mapname.bmp" "$outputdir/overviews"
+
+	echo >> ./$outputdir/maps/$mapname.res
+	echo "overviews/$mapname.bmp" >> ./$outputdir/maps/$mapname.res
+
+	# Attempt to get associated .txt file
+	if wget -q -P "$outputdir/overviews" "$fastdlrooturl/overviews/$mapname.txt";
+	then
+		echo "overviews/$mapname.txt" >> ./$outputdir/maps/$mapname.res
+	fi
+else
+	echo "Overview not found."
+fi
