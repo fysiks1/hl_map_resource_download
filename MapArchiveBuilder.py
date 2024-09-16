@@ -29,7 +29,7 @@ class MapArchiveBuilder:
 		## Generate res file
 		resgenPath=os.path.join(self.resgenRootPath, "RESGen.exe")
 		resgenRFA=os.path.join(self.resgenRootPath, "rfa/res_dod.rfa")
-		resgenSubprocessArgs = [resgenPath, "-b", resgenRFA, "%s/maps/%s.bsp" % (self.archivePath, self.mapname)]
+		resgenSubprocessArgs = [resgenPath, "-v", "-b", resgenRFA, "%s/maps/%s.bsp" % (self.archivePath, self.mapname)]
 		if platform.system() == "Linux":
 			resgenSubprocessArgs.insert(0, "wine")
 		subprocess.run(resgenSubprocessArgs)
