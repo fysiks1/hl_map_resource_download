@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import subprocess
 import platform
@@ -139,4 +140,14 @@ class LocalGetter(ResourceGetter):
 			shutil.copyfile(src, dest)
 		else:
 			raise FileNotFoundError
+
+
+
+if __name__ == "__main__":
+	map = MapArchiveBuilder(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+	map.build()
+
+
+
+
 
