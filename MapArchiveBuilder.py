@@ -29,11 +29,9 @@ class MapArchiveBuilder:
 		self.getter.getRelativeFile("maps/%s.bsp" % self.mapname)
 
 		## Generate res file
-		resgenPath=os.path.join(self.resgenRootPath, "RESGen.exe")
-		resgenRFA=os.path.join(self.resgenRootPath, "rfa/res_dod.rfa")
+		resgenPath = os.path.join(self.resgenRootPath, "resgen" if platform.system() == "Linux" else "RESGen.exe")
+		resgenRFA = os.path.join(self.resgenRootPath, "rfa/res_dod.rfa")
 		resgenSubprocessArgs = [resgenPath, "-v", "-b", resgenRFA, "%s/maps/%s.bsp" % (self.archivePath, self.mapname)]
-		if platform.system() == "Linux":
-			resgenSubprocessArgs.insert(0, "wine")
 		subprocess.run(resgenSubprocessArgs)
 
 		f = open(self.resFile, "r")
