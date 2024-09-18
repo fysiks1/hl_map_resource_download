@@ -66,16 +66,23 @@ class MapArchiveBuilder:
 			pass
 
 		## Look for overview file
-		ovrImgFile = "overviews/%s.bmp" % self.mapname
+		ovrBmpFile = "overviews/%s.bmp" % self.mapname
+		ovrTgaFile = "overviews/%s.tga" % self.mapname
 		ovrDataFile = "overviews/%s.txt" % self.mapname
 		try:
-			self.getter.getRelativeFile(ovrImgFile)
-			self.addResourceToFile(ovrImgFile)
+			self.getter.getRelativeFile(ovrTgaFile)
 			self.getter.getRelativeFile(ovrDataFile)
+			self.addResourceToFile(ovrTgaFile)
 			self.addResourceToFile(ovrDataFile)
 		except FileNotFoundError:
-			shutil.rmtree(os.path.join(self.archivePath, "overviews"))
-			print("Overview not found")
+			try:
+				self.getter.getRelativeFile(ovrBmpFile)
+				self.getter.getRelativeFile(ovrDataFile)
+				self.addResourceToFile(ovrBmpFile)
+				self.addResourceToFile(ovrDataFile)
+			except FileNotFoundError:
+				shutil.rmtree(os.path.join(self.archivePath, "overviews"))
+				print("Overview not found")
 
 		## Custom Objective Icons
 		# These are set on the `dod_control_point` entity via the 
