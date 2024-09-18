@@ -23,10 +23,10 @@ class MapArchiveBuilder:
 		## Create map archive root folder
 		if os.path.exists(self.archivePath):
 			shutil.rmtree(self.archivePath)
-		os.makedirs(self.archivePath, exist_ok=True)
 
 		## Download map file
 		self.getter.getRelativeFile("maps/%s.bsp" % self.mapname)
+		os.makedirs(self.archivePath, exist_ok=True)
 
 		## Generate res file
 		resgenPath = os.path.join(self.resgenRootPath, "resgen" if platform.system() == "Linux" else "RESGen.exe")
