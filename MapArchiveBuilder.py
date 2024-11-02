@@ -90,12 +90,15 @@ class MapArchiveBuilder:
 		for team in ["allies", "axis", "neutral", "brit"]:
 			for index in [1, 2, 3]:
 				objfile = "sprites/obj_icons/%s/icon_obj_custom%d_%s.spr" % (self.mapname, index, team)
-				try:
-					self.getter.getRelativeFile(objfile)
-					self.addResourceToFile(objfile)
-				except FileNotFoundError:
-					pass
+				if objfile not in self.resources:
+					try:
+						self.getter.getRelativeFile(objfile)
+						self.addResourceToFile(objfile)
+					except FileNotFoundError:
+						pass
 
+		# Cleanup
+		delete_empty_folders(self.archivePath)
 
 	def addResourceToFile(self, relRes):
 		if relRes not in self.resources:
@@ -146,6 +149,25 @@ class LocalGetter(ResourceGetter):
 		else:
 			raise FileNotFoundError
 
+def delete_empty_folders(root):
+	"""
+		source: https://stackoverflow.com/a/65624165
+	"""
+	deleted = set()
+	
+	for current_dir, subdirs, files in os.walk(root, topdown=False):
+
+		still_has_subdirs = False
+		for subdir in subdirs:
+			if os.path.join(current_dir, subdir) not in deleted:
+				still_has_subdirs = True
+				break
+	
+		if not any(files) and not still_has_subdirs:
+			os.rmdir(current_dir)
+			deleted.add(current_dir)
+
+	return deleted
 
 
 if __name__ == "__main__":
