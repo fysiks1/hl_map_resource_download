@@ -171,6 +171,11 @@ def delete_empty_folders(root):
 
 
 if __name__ == "__main__":
+	print("Map:  %s" % sys.argv[1])
+	print("Server Files:  %s" % sys.argv[2])
+	print("Output Directory:  %s" % sys.argv[3])
+	print("Resgen Folder:  %s" % sys.argv[4])
+
 	map = MapArchiveBuilder(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 	map.build()
 
