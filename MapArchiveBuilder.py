@@ -85,21 +85,6 @@ class MapArchiveBuilder:
 				shutil.rmtree(os.path.join(self.archivePath, "overviews"))
 				print("Overview not found")
 
-		## Custom Objective Icons
-		# These are set on the `dod_control_point` entity via the 
-		# `point_hud_icon_<neutral|axis|allies>`property set to 
-		# values 18 through 27. ResGen doesn't detect these.
-
-		for team in ["allies", "axis", "neutral", "brit"]:
-			for index in [1, 2, 3]:
-				objfile = "sprites/obj_icons/%s/icon_obj_custom%d_%s.spr" % (self.mapname, index, team)
-				if objfile not in self.resources:
-					try:
-						self.getter.getRelativeFile(objfile)
-						self.addResourceToFile(objfile)
-					except FileNotFoundError:
-						pass
-
 		# Cleanup
 		delete_empty_folders(self.archivePath)
 
