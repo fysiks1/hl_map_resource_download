@@ -64,7 +64,7 @@ class MapArchiveBuilder:
 			self.getter.getRelativeFile(mapDetailFile)
 			self.addResourceToFile(mapDetailFile)
 		except FileNotFoundError:
-			pass
+			print("Detailed textures info not found")
 
 		## Look for overview file
 		ovrBmpFile = "overviews/%s.bmp" % self.mapname
