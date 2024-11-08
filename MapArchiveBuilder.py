@@ -12,6 +12,7 @@ class MapArchiveBuilder:
 		self.archivePath = os.path.join(outDir, mapname)
 		self.resgenRootPath = resgenRootPath
 		self.resFile = "%s/maps/%s.res" % (self.archivePath, self.mapname)
+		self.missingFile = "%s/_missing.txt" % (self.archivePath)
 
 		if os.path.exists(basePath):
 			self.getter = LocalGetter(basePath, self.archivePath)
@@ -38,18 +39,28 @@ class MapArchiveBuilder:
 		lines = f.readlines()
 
 		self.resources = []
+		self.missing = []
 		for line in lines:
 			line = line.strip()
 			if( line and line[0] != "/"):
 				self.resources.append(line)
 
 		## Download required resources based on the res file
+		print("Downloading resources...")
 		for res in self.resources:
 			try:
 				self.getter.getRelativeFile(res)
 			except FileNotFoundError:
-				self._fatal_filenotfound_message(res)
-
+				print("File not found:  %s" % res)
+				
+				self.addMissingResourceToFile(res)
+				
+				skip = input("Skip file? (y/n): ")
+				if( skip != "y" ):
+					self._fatal_filenotfound_message(res)
+				
+				print("Check %s for missing file list." % self.missingFile)
+		
 		## Map Info
 		mapDataFile = "maps/%s.txt" % self.mapname
 		try:
@@ -94,8 +105,19 @@ class MapArchiveBuilder:
 				myfile.write("\n")
 				myfile.write(relRes)
 
+	def addMissingResourceToFile(self, path):
+		if path not in self.missing:
+			with open(self.missingFile, "a") as myfile:
+				myfile.write("\n")
+				myfile.write(path)
+
 	def _fatal_filenotfound_message(self, file):
 		print("File not found:  %s" % file)
+		
+		# Clean up
+		if os.path.exists(self.archivePath):
+			shutil.rmtree(self.archivePath)
+
 		exit()
 
 
