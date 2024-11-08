@@ -45,7 +45,10 @@ class MapArchiveBuilder:
 
 		## Download required resources based on the res file
 		for res in self.resources:
-			self.getter.getRelativeFile(res)
+			try:
+				self.getter.getRelativeFile(res)
+			except FileNotFoundError:
+				self._fatal_filenotfound_message(res)
 
 		## Map Info
 		mapDataFile = "maps/%s.txt" % self.mapname
@@ -105,6 +108,11 @@ class MapArchiveBuilder:
 			with open(self.resFile, "a") as myfile:
 				myfile.write("\n")
 				myfile.write(relRes)
+
+	def _fatal_filenotfound_message(self, file):
+		print("File not found:  %s" % file)
+		exit()
+
 
 
 
