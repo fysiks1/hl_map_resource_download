@@ -127,12 +127,14 @@ class WebGetter(ResourceGetter):
 		self.baseUrl = baseUrl
 		self.archivePath = destBasePath
 
-	def getRelativeFile(self, file):
+	def getRelativeFile(self, file, notify=False):
 		src = urljoin(self.baseUrl, file)
 		dest = os.path.join(self.archivePath, file)
 		os.makedirs(os.path.dirname(dest), exist_ok=True)
 
-		print("Download file: %s" % file)
+		if notify:
+			print("Download file: %s" % file)
+
 		try:
 			urllib.request.urlretrieve(src, dest)
 		except urllib.error.HTTPError:
@@ -144,11 +146,12 @@ class LocalGetter(ResourceGetter):
 		self.basePath = srcBasePath
 		self.archivePath = destBasePath
 
-	def getRelativeFile(self, file):
+	def getRelativeFile(self, file, notify=False):
 		src = os.path.join(self.basePath, file)
 		dest = os.path.join(self.archivePath, file)
 
-		print("Get file: %s" % src)
+		if notify:
+			print("Get file: %s" % src)
 
 		if os.path.exists(src):
 			os.makedirs(os.path.dirname(dest), exist_ok=True)
