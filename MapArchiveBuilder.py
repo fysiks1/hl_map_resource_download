@@ -93,7 +93,10 @@ class MapArchiveBuilder:
 				self.addResourceToFile(ovrBmpFile)
 				self.addResourceToFile(ovrDataFile)
 			except FileNotFoundError:
-				shutil.rmtree(os.path.join(self.archivePath, "overviews"))
+				try:
+					shutil.rmtree(os.path.join(self.archivePath, "overviews"))
+				except FileNotFoundError:
+					pass
 				print("Overview not found")
 
 		# Cleanup
