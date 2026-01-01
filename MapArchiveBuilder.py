@@ -13,14 +13,19 @@ class MapArchiveBuilder:
 		self.resgenRootPath = resgenRootPath
 		self.resFile = "%s/maps/%s.res" % (self.archivePath, self.mapname)
 		self.missingFile = "%s/_missing.txt" % (self.archivePath)
+		print("Base Path: %s" % basePath)
 
 		if os.path.exists(basePath):
 			self.getter = LocalGetter(basePath, self.archivePath)
+			print("Local Path Detected")
 		else:
 			self.getter = WebGetter(basePath, self.archivePath)
+			print("Web URL Detected")
 
 	def build(self):
 		"""Build the map archive"""
+		skipall = False
+		
 		## Create map archive root folder
 		if os.path.exists(self.archivePath):
 			shutil.rmtree(self.archivePath)
@@ -55,11 +60,14 @@ class MapArchiveBuilder:
 				
 				self.addMissingResourceToFile(res)
 				
-				skip = input("Skip file? (y/n): ")
-				if( skip != "y" ):
-					self._fatal_filenotfound_message(res)
-				
-				print("Check %s for missing file list." % self.missingFile)
+				if not skipall:
+					skip = input("Skip file? (y/n): ")
+					if( skip == "a" ):
+						skipall = True
+					elif( skip != "y" ):
+						self._fatal_filenotfound_message(res)
+					
+					print("Check %s for missing file list." % self.missingFile)
 		
 		## Map Info
 		mapDataFile = "maps/%s.txt" % self.mapname
