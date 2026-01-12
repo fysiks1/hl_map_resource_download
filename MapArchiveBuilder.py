@@ -161,7 +161,7 @@ class WebGetter(ResourceGetter):
 
 class LocalGetter(ResourceGetter):
 	def __init__(self, srcBasePath, destBasePath):
-		self.basePath = srcBasePath
+		self.basePath = self._find_game_root_dir(srcBasePath)
 		self.archivePath = destBasePath
 
 	def getRelativeFile(self, file, notify=False):
@@ -177,6 +177,19 @@ class LocalGetter(ResourceGetter):
 			shutil.copyfile(src, dest)
 		else:
 			raise FileNotFoundError
+	
+	def _find_folder_by_name(self, root_path, folder_name):
+		for dirpath, dirnames, filenames in os.walk(root_path):
+			if folder_name in dirnames:
+				return os.path.join(dirpath, folder_name)
+		return None
+
+	def _find_game_root_dir(self, path):
+		foundPath = self._find_folder_by_name(path, "maps")
+		if foundPath:
+			return os.path.dirname(foundPath)
+		raise FileNotFoundError("Game root directory not found in provided source path")
+
 
 def delete_empty_folders(root):
 	"""
