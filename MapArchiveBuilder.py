@@ -40,7 +40,8 @@ class MapArchiveBuilder:
 		resgenSubprocessArgs = [resgenPath, "-v", "-b", resgenRFA, "%s/maps/%s.bsp" % (self.archivePath, self.mapname)]
 		subprocess.run(resgenSubprocessArgs)
 
-		f = open(self.resFile, "w+")
+		f = open(self.resFile, "a+")
+		f.seek(0)
 		lines = f.readlines()
 
 		self.resources = []
